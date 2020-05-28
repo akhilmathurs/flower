@@ -25,6 +25,7 @@ import tensorflow as tf
 
 import flower as flwr
 from flower.logger import log
+from flower.typing import Weights
 
 from .data import build_dataset
 
@@ -38,7 +39,7 @@ def custom_fit(
     callbacks: List[tf.keras.callbacks.Callback],
     delay_factor: float = 0.0,
     timeout: Optional[int] = None,
-) -> Tuple[bool, float, int]:
+) -> Tuple[bool, float, int, float, Weights]:
     """Train the model using a custom training loop."""
     ds_train = dataset.batch(batch_size=batch_size, drop_remainder=False)
 
@@ -79,7 +80,7 @@ def custom_fit(
                 fit_duration = timeit.default_timer() - fit_begin
                 if fit_duration > timeout:
                     log(INFO, "client timeout")
-                    return (False, fit_duration, num_examples)
+                    return (False, fit_duration, num_examples, loss_value, grads)
             batch_begin = timeit.default_timer()
 
     # End epoch
@@ -93,7 +94,7 @@ def custom_fit(
     )
 
     fit_duration = timeit.default_timer() - fit_begin
-    return True, fit_duration, num_examples
+    return True, fit_duration, num_examples, loss_value, grads
 
 
 def loss(

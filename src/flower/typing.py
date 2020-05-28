@@ -40,7 +40,7 @@ class ParametersRes:
 
 FitIns = Tuple[Parameters, Dict[str, str]]  # model parameters, config
 FitRes = Tuple[
-    Parameters, int, int, float
-]  # model parameters, num_examples_processed, num_examples_ceil, fit_duration
+    Parameters, int, int, float, float, Parameters
+]  # model parameters, num_examples_processed, num_examples_ceil, fit_duration, loss, gradients
 EvaluateIns = Tuple[Parameters, Dict[str, str]]  # model parameters, config
 EvaluateRes = Tuple[int, float, Optional[float]]  # num_examples, loss, accuracy

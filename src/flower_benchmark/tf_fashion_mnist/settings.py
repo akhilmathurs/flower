@@ -21,10 +21,10 @@ from flower_benchmark.common import configure_client_instances, sample_delay_fac
 from flower_benchmark.setting import ClientSetting, ServerSetting, Setting
 from flower_ops.cluster import Instance
 
-ROUNDS = 20
-MIN_NUM_CLIENTS = 80
-SAMPLE_FRACTION = 0.5
-MIN_SAMPLE_SIZE = 50
+ROUNDS = 4
+MIN_NUM_CLIENTS = 5
+SAMPLE_FRACTION = 1.0
+MIN_SAMPLE_SIZE = 5
 
 LR_INITIAL = 0.01
 
@@ -78,7 +78,7 @@ client_instances_100, client_names_100 = configure_client_instances(
 )
 
 client_instances_10, client_names_10 = configure_client_instances(
-    num_clients=10, num_cpu=2, num_ram=4
+    num_clients=5, num_cpu=2, num_ram=4
 )
 
 # pylint: disable=too-many-arguments
@@ -365,6 +365,32 @@ SETTINGS = {
             iid_fraction=IID_FRACTION,
             instance_names=client_names_100,
             num_clients=100,
+            dry_run=False,
+            delay_factor_fast=0.0,
+            delay_factor_slow=MAX_DELAY_FACTOR,
+        ),
+    ),
+    "afl": Setting(
+        instances=[Instance(name="server", group="server", num_cpu=4, num_ram=16)]
+        + client_instances_10,
+        server=ServerSetting(
+            instance_name="server",
+            strategy="afl",
+            rounds=ROUNDS,
+            min_num_clients=MIN_NUM_CLIENTS,
+            sample_fraction=SAMPLE_FRACTION,
+            min_sample_size=MIN_SAMPLE_SIZE,
+            training_round_timeout=None,
+            lr_initial=LR_INITIAL,
+            partial_updates=False,
+            importance_sampling=False,
+            dynamic_timeout=False,
+            dry_run=False,
+        ),
+        clients=configure_clients(
+            iid_fraction=IID_FRACTION,
+            instance_names=client_names_10,
+            num_clients=5,
             dry_run=False,
             delay_factor_fast=0.0,
             delay_factor_slow=MAX_DELAY_FACTOR,

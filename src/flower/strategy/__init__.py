@@ -15,6 +15,7 @@
 """Contains the strategy abstraction and different implementations."""
 
 
+from .afl import AFL
 from .default import DefaultStrategy
 from .fast_and_slow import FastAndSlow
 from .fault_tolerant_fedavg import FaultTolerantFedAvg

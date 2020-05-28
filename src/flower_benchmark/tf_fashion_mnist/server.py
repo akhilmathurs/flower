@@ -109,6 +109,15 @@ def main() -> None:
             on_fit_config_fn=on_fit_config_fn,
         )
 
+    if server_setting.strategy == "afl":
+        strategy = flwr.strategy.AFL(
+            afl_learning_rate=0.1,
+            fraction_fit=server_setting.sample_fraction,
+            min_fit_clients=server_setting.min_sample_size,
+            min_available_clients=server_setting.min_num_clients,
+            eval_fn=eval_fn,
+            on_fit_config_fn=on_fit_config_fn,
+        )
     # Run server
     server = flwr.Server(client_manager=client_manager, strategy=strategy)
     flwr.app.start_server(
@@ -125,7 +134,7 @@ def get_on_fit_config_fn(
         """Return a configuration with static batch size and (local) epochs."""
         config = {
             "epoch_global": str(rnd),
-            "epochs": str(5),
+            "epochs": str(1),
             "batch_size": str(32),
             "lr_initial": str(lr_initial),
             "lr_decay": str(0.99),

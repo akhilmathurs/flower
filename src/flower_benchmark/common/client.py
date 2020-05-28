@@ -91,7 +91,7 @@ class VisionClassificationClient(flwr.Client):
         self.model.set_weights(weights)
 
         # Train the local model using the local dataset
-        completed, fit_duration, num_examples = custom_fit(
+        completed, fit_duration, num_examples, loss_value, grads = custom_fit(
             model=self.model,
             dataset=self.ds_train,
             num_epochs=epochs,
@@ -108,10 +108,19 @@ class VisionClassificationClient(flwr.Client):
         if not completed and not partial_updates:
             # Return empty update if local update could not be completed in time
             parameters = flwr.weights_to_parameters([])
+            gradients = flwr.weights_to_parameters([])
         else:
             # Return the refined weights and the number of examples used for training
             parameters = flwr.weights_to_parameters(self.model.get_weights())
-        return parameters, num_examples, num_examples_ceil, fit_duration
+            gradients = flwr.weights_to_parameters(grads[1])
+        return (
+            parameters,
+            num_examples,
+            num_examples_ceil,
+            fit_duration,
+            loss_value,
+            gradients,
+        )
 
     def evaluate(self, ins: flwr.EvaluateIns) -> flwr.EvaluateRes:
         weights = flwr.parameters_to_weights(ins[0])
